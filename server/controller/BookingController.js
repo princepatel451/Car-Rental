@@ -43,7 +43,7 @@ export const createBooking = async(req, res) => {
 
         const isAvailable = await checkAvailability(car, pickupDate, returnDate)
         if(!isAvailable){
-            res.json({success: false, message: 'Car is not Available'})
+            return res.json({success: false, message: 'Car is not Available'})
         }
 
         const carData = await Car.findById(car)
@@ -82,7 +82,7 @@ export const getUserBookings = async (req, res) => {
 export const getOwnerBookings = async (req, res) => {
     try{
         if(req.user.role !== 'owner'){
-            res.json({success: false, message: 'Unauthorised'})
+            return res.json({success: false, message: 'Unauthorised'})
         }
         const bookings = await Booking.find({owner: req.user._id}).populate('car user').select("-user.password")
         .sort({createdAt: -1})
