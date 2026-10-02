@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
 import Title from '../components/Title'
 import { useAppContext } from '../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const MyBookings = () => {
   const {axios, user, currency }  = useAppContext()
@@ -22,9 +23,11 @@ const MyBookings = () => {
     }
   }
 
-  useEffect(()=>(
-    user && fetchMyBookings()
-  ),[user])
+  useEffect(() => {
+    if (user) {
+      fetchMyBookings()
+    }
+  }, [user])
 
 
   return (

@@ -1,5 +1,24 @@
+# Dependencies
 node_modules/
-.DS_Store
-env/
-venv/
+client/node_modules/
+server/node_modules/
+
+# Production build
 dist/
+client/dist/
+
+# Environment files
+.env
+.env*.local
+client/.env
+server/.env
+
+# Logs and system
+*.log
+npm-debug.log*
+.DS_Store
+
+# IDE & deployment
+.vscode/
+.idea/
+.vercel

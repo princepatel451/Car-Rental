@@ -3,7 +3,8 @@ import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from "react-router-dom";
 
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
+const rawBaseURL = import.meta.env.VITE_BASE_URL || ''
+axios.defaults.baseURL = rawBaseURL.replace(/\/+$/, '')
 
 
 export const AppContext = createContext();
@@ -23,9 +24,9 @@ export const AppProvider = ({ children }) => {
 
     const fetchUser = async () => {
         try{
-            const {data} = await axios.get('api/user/data')
+            const {data} = await axios.get('/api/user/data')
             if(data.success){
-                setUser(user.data)
+                setUser(data.user)
                 setIsOwner(data.user.role === 'owner')    
             }
             else{

@@ -31,7 +31,7 @@ export const registerUser = async (req, res) =>  {
         
     } catch (error) {
         console.log(error.message)
-        res.send({sucess: false, message: error.message})
+        res.send({success: false, message: error.message})
     }
 }
 
