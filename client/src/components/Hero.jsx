@@ -1,14 +1,33 @@
 import React, { useState } from 'react'
 import { assets, cityList } from '../assets/assets'
 import { useAppContext } from '../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const Hero = () => {
     const [pickupLocation,setPickupLocation] = useState('')
     const {pickupDate,setPickupDate, returnDate, setReturnDate, navigate} = useAppContext()
 
+    const today = new Date().toISOString().split('T')[0]
+
+    const handlePickupDateChange = (e) => {
+        const selected = e.target.value
+        setPickupDate(selected)
+        if (returnDate && returnDate < selected) {
+            setReturnDate(selected)
+        }
+    }
+
     const handleSearch = (e) => {
         e.preventDefault()
-        navigate('/cars?pickupLocation=' + pickupLocation + '&pickupDate=' + pickupDate + '&returnDate=' + returnDate)
+        if (!pickupLocation) {
+            toast.error('Please select a pickup location')
+            return
+        }
+        if (returnDate < pickupDate) {
+            toast.error('Return date must be greater than or equal to pickup date')
+            return
+        }
+        navigate('/cars?pickupLocation=' + encodeURIComponent(pickupLocation) + '&pickupDate=' + pickupDate + '&returnDate=' + returnDate)
     }
 
   return (
@@ -21,7 +40,7 @@ const Hero = () => {
 
                 <div className='flex flex-col items-start gap-2'>
                     <select value={pickupLocation} onChange={(e)=>setPickupLocation(e.target.value)} required>
-                        <option>Pickup Location</option>
+                        <option value="">Pickup Location</option>
                         {cityList.map((city) => <option key={city} value={city}>{city}</option>)}
                     </select>
                     <p className='px-1 text-sm text-gray-500'>{pickupLocation ? pickupLocation : "Please Select Location"}</p>
@@ -29,12 +48,12 @@ const Hero = () => {
 
                 <div className='flex flex-col items-start gap-2'>
                     <label htmlFor='pickup-date'>Pick-up Date</label>
-                    <input value={pickupDate} onChange={(e)=>setPickupDate(e.target.value)} type="date" id="pickup-date" min={new Date().toISOString().split('T')[0]} className='text-sm text-gray-500' required/>
+                    <input value={pickupDate} onChange={handlePickupDateChange} type="date" id="pickup-date" min={today} className='text-sm text-gray-500' required/>
                 </div>
 
                 <div className='flex flex-col items-start gap-2'>
                     <label htmlFor='return-date'>Return Date</label>
-                    <input value={returnDate} onChange={(e)=>setReturnDate(e.target.value)} type="date" id="return-date" min={new Date().toISOString().split('T')[0]} className='text-sm text-gray-500' required/>
+                    <input value={returnDate} onChange={(e)=>setReturnDate(e.target.value)} type="date" id="return-date" min={pickupDate || today} className='text-sm text-gray-500' required/>
                 </div>
 
 

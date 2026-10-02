@@ -4,6 +4,7 @@ import { assets } from '../assets/assets'
 import CarCard from '../components/CarCard'
 import { useSearchParams } from 'react-router-dom'
 import { useAppContext } from '../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const Cars = () => {
   const {cars, axios} = useAppContext()
@@ -27,7 +28,7 @@ const Cars = () => {
       return car.brand.toLowerCase().includes(input.toLowerCase())
       || car.model.toLowerCase().includes(input.toLowerCase())
       || car.category.toLowerCase().includes(input.toLowerCase())
-      || car.trasmission.toLowerCase().includes(input.toLowerCase())
+      || (car.transmission || car.trasmission || '').toLowerCase().includes(input.toLowerCase())
     })
 
     setFilteredCars(filtered)

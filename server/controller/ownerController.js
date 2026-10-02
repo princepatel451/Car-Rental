@@ -26,24 +26,34 @@ export const addCar = async (req, res) => {
         let car = JSON.parse(req.body.carData)
         const imageFile = req.file;
 
-        //Upload image to imageKit
-        const fileBuffer = fs.readFileSync(imageFile.path)
-        const response = await imagekit.upload({
-            file: fileBuffer,
+        if (!imageFile) {
+            return res.json({success: false, message: 'Please upload an image'})
+        }
+
+        //Upload image to imageKit using stream
+        const fileStream = fs.createReadStream(imageFile.path)
+        const uploadMethod = (imagekit.files && typeof imagekit.files.upload === 'function') 
+            ? imagekit.files.upload.bind(imagekit.files) 
+            : imagekit.upload.bind(imagekit);
+
+        const response = await uploadMethod({
+            file: fileStream,
             fileName: imageFile.originalname,
             folder: '/cars'
-
         });
 
         //optimisation through imageKit 
-        var optimisedImageUrl = imagekit.url({
+        const optimisedImageUrl = imagekit.url({
             path: response.filePath,
             transformation: [
                 {width: 1280},
                 {quality: 'auto'},
                 {format: 'webp'},
             ]
-        });
+        }) || response.url;
+
+        // Clean up temporary local uploaded file
+        try { fs.unlinkSync(imageFile.path) } catch (e) {}
 
         const image = optimisedImageUrl;
         await Car.create({...car, owner: _id, image})
@@ -163,25 +173,34 @@ export const updateUserImage = async (req, res) => {
         const {_id} = req.user
 
         const imageFile = req.file;
+        if (!imageFile) {
+            return res.json({success: false, message: 'Please upload an image'})
+        }
 
-        //Upload image to imageKit
-        const fileBuffer = fs.readFileSync(imageFile.path)
-        const response = await imagekit.upload({
-            file: fileBuffer,
+        //Upload image to imageKit using stream
+        const fileStream = fs.createReadStream(imageFile.path)
+        const uploadMethod = (imagekit.files && typeof imagekit.files.upload === 'function') 
+            ? imagekit.files.upload.bind(imagekit.files) 
+            : imagekit.upload.bind(imagekit);
+
+        const response = await uploadMethod({
+            file: fileStream,
             fileName: imageFile.originalname,
             folder: '/users'
-
         });
 
         //optimisation through imageKit 
-        var optimisedImageUrl = imagekit.url({
+        const optimisedImageUrl = imagekit.url({
             path: response.filePath,
             transformation: [
                 {width: 1280},
                 {quality: 'auto'},
                 {format: 'webp'},
             ]
-        });
+        }) || response.url;
+
+        // Clean up temporary local uploaded file
+        try { fs.unlinkSync(imageFile.path) } catch (e) {}
 
         const image = optimisedImageUrl;
 

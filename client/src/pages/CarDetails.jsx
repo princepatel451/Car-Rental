@@ -16,6 +16,10 @@ const CarDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (returnDate < pickupDate) {
+      toast.error('Return date must be greater than or equal to pickup date')
+      return
+    }
     try{
       const {data} = await axios.post('/api/bookings/create', {car: id, pickupDate, returnDate})
       if(data.success){
@@ -99,14 +103,18 @@ const CarDetails = () => {
 
             <div className="flex flex-col gap-2">
               <label htmlFor="pickup-date">PickUp Date</label>
-              <input value={pickupDate} onChange={()=>{(e) => setPickupDate(e.target.value)}} type="date" id="pickup-date" className='border-borderColor px-3 py-2 rounded-lg' 
+              <input value={pickupDate} onChange={(e) => {
+                const val = e.target.value
+                setPickupDate(val)
+                if (returnDate && returnDate < val) setReturnDate(val)
+              }} type="date" id="pickup-date" className='border-borderColor px-3 py-2 rounded-lg' 
               min={new Date().toISOString().split('T')[0]} required/>
             </div>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="return-date">Return Date</label>
-              <input value={returnDate} onChange={()=>{(e) => setReturnDate(e.target.value)}}type="date" id="return-date" className='border-borderColor px-3 py-2 rounded-lg' 
-              min={new Date().toISOString().split('T')[0]} required/>
+              <input value={returnDate} onChange={(e) => setReturnDate(e.target.value)} type="date" id="return-date" className='border-borderColor px-3 py-2 rounded-lg' 
+              min={pickupDate || new Date().toISOString().split('T')[0]} required/>
             </div>
 
             <button className='w-full bg-primary hover:bg-primary-dull transition-all py-3 font-medium 
