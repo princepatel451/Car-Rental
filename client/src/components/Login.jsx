@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAppContext } from '../Context/AppContext';
+import toast from 'react-hot-toast'
 
 const Login = () => {
 
@@ -9,10 +10,13 @@ const Login = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const onSubmitHandler = async (e) => {
+        e.preventDefault()
+        if (loading) return
+        setLoading(true)
         try {
-            e.preventDefault()
             const {data} = await axios.post(`/api/user/${state}`,{name, email, password})
 
             if(data.success){
@@ -20,13 +24,15 @@ const Login = () => {
                 setToken(data.token)
                 localStorage.setItem('token',data.token)
                 setShowLogin(false)
+                toast.success(state === 'login' ? 'Logged in successfully' : 'Registered successfully')
             }
             else{
                 toast.error(data.message)
             } 
         } catch (error) {
-            toast.error(error.message)
-            
+            toast.error(error.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
         }
     }
   return (
@@ -58,8 +64,8 @@ const Login = () => {
                     Create an account? <span onClick={() => setState("register")} className="text-primary cursor-pointer">click here</span>
                 </p>
             )}
-            <button className="bg-primary hover:bg-blue-800 transition-all text-white w-full py-2 rounded-md cursor-pointer">
-                {state === "register" ? "Create Account" : "Login"}
+            <button disabled={loading} className={`bg-primary hover:bg-blue-800 transition-all text-white w-full py-2 rounded-md ${loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}>
+                {loading ? 'Please wait...' : (state === "register" ? "Create Account" : "Login")}
             </button>
         </form>
     </div>

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { dummyMyBookingsData } from '../../assets/assets'
 import Title from '../../components/owner/Title'
+import { useAppContext } from '../../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const MangaeBookings = () => {
+  const { axios } = useAppContext()
   const currency = import.meta.env.VITE_CURRENCY
   const [bookings, setBookings] = useState([])
 

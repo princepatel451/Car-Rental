@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Title from '../../components/owner/Title'
 import { assets } from '../../assets/assets'
 import { useAppContext } from '../../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const AddCar = () => {
 
@@ -28,14 +29,14 @@ const AddCar = () => {
 
     setIsLoading(true)
     try{
-      const formData = new formData()
+      const formData = new FormData()
       formData.append('image',image)
-      formData.append('carData', JSON.stringyfy(car))
+      formData.append('carData', JSON.stringify(car))
 
       const {data} = await axios.post('/api/owner/add-car',formData)
 
       if(data.success){
-        toast.succes(data.message)
+        toast.success(data.message)
         setCar({
         brand: '',
         model: '',
